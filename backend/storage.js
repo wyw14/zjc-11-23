@@ -181,4 +181,14 @@ export function resetStory(storyId) {
   return { success: true, story: formatStoryDetail(story) };
 }
 
+export function deleteStory(storyId) {
+  const data = readData();
+  if (!data.stories[storyId]) {
+    return { success: false, error: '故事不存在', code: 404 };
+  }
+  delete data.stories[storyId];
+  writeData(data);
+  return { success: true };
+}
+
 export { MAX_PARTICIPANTS, MAX_CHARS_PER_STORY };

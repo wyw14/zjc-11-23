@@ -81,6 +81,13 @@
                       >
                         {{ resetting === s.id ? '重置中...' : '重置' }}
                       </button>
+                      <button
+                        class="btn-danger btn-sm btn-danger-outline"
+                        :disabled="deleting === s.id"
+                        @click="askDelete(s)"
+                      >
+                        {{ deleting === s.id ? '删除中...' : '删除' }}
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -138,6 +145,50 @@
       </div>
     </div>
 
+    <div
+      v-if="deleteConfirmVisible"
+      class="modal-mask"
+      @click.self="deleteConfirmVisible = false"
+    >
+      <div class="modal card confirm-modal">
+        <div class="modal-header danger">
+          <h3>🗑️ 确认删除</h3>
+          <button class="close-btn" @click="deleteConfirmVisible = false">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="confirm-content">
+            <div class="confirm-icon">⚠️</div>
+            <p class="confirm-text">
+              确定要删除故事 <strong>{{ deleteTargetStory?.title }}</strong> 吗？
+            </p>
+            <ul class="confirm-info">
+              <li>故事将从列表中永久移除</li>
+              <li>所有 <strong>{{ deleteTargetStory?.entryCount }}</strong> 段内容将被清除</li>
+              <li>数据文件中的相关记录会被删除</li>
+              <li><strong class="delete-warn">此操作不可撤销！</strong></li>
+            </ul>
+          </div>
+          <div v-if="deleteError" class="error-text">{{ deleteError }}</div>
+        </div>
+        <div class="modal-footer">
+          <button
+            class="btn-secondary"
+            :disabled="deleting === deleteTargetStory?.id"
+            @click="deleteConfirmVisible = false"
+          >
+            取消
+          </button>
+          <button
+            class="btn-danger"
+            :disabled="deleting === deleteTargetStory?.id"
+            @click="doDelete"
+          >
+            {{ deleting === deleteTargetStory?.id ? '正在删除...' : '确认删除' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div v-if="toast.show" :class="['toast', toast.type]">
       {{ toast.message }}
     </div>
@@ -157,6 +208,10 @@ const resetting = ref(null)
 const resetError = ref('')
 const confirmVisible = ref(false)
 const targetStory = ref(null)
+const deleting = ref(null)
+const deleteError = ref('')
+const deleteConfirmVisible = ref(false)
+const deleteTargetStory = ref(null)
 
 const toast = ref({ show: false, message: '', type: 'success' })
 
@@ -199,6 +254,28 @@ async function doReset() {
     resetError.value = e.message
   } finally {
     resetting.value = null
+  }
+}
+
+function askDelete(story) {
+  deleteTargetStory.value = story
+  deleteError.value = ''
+  deleteConfirmVisible.value = true
+}
+
+async function doDelete() {
+  if (!deleteTargetStory.value) return
+  deleteError.value = ''
+  deleting.value = deleteTargetStory.value.id
+  try {
+    await api.deleteStory(deleteTargetStory.value.id)
+    deleteConfirmVisible.value = false
+    showToast('故事已删除成功')
+    await loadStories()
+  } catch (e) {
+    deleteError.value = e.message
+  } finally {
+    deleting.value = null
   }
 }
 
@@ -441,6 +518,22 @@ onMounted(loadStories)
 
 .confirm-info strong {
   color: var(--error);
+}
+
+.delete-warn {
+  color: var(--error) !important;
+  font-size: 14px !important;
+}
+
+.btn-danger-outline {
+  background: transparent !important;
+  color: var(--error) !important;
+  border: 1px solid var(--error) !important;
+}
+
+.btn-danger-outline:hover:not(:disabled) {
+  background: var(--error) !important;
+  color: white !important;
 }
 
 .modal-footer {

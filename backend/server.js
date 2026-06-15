@@ -6,6 +6,7 @@ import {
   getStoryById,
   addEntry,
   resetStory,
+  deleteStory,
   MAX_PARTICIPANTS,
   MAX_CHARS_PER_STORY
 } from './storage.js';
@@ -108,6 +109,21 @@ app.post('/api/admin/stories/:id/reset', (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: '重置故事失败' });
+  }
+});
+
+app.delete('/api/admin/stories/:id', (req, res) => {
+  try {
+    const result = deleteStory(req.params.id);
+    if (!result.success) {
+      return res.status(result.code || 400).json({ error: result.error });
+    }
+    res.json({
+      message: '故事已删除'
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '删除故事失败' });
   }
 });
 

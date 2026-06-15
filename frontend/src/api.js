@@ -19,7 +19,8 @@ export const api = {
   getStory: (id) => request.get(`/stories/${id}`),
   createStory: (data) => request.post('/stories', data),
   addEntry: (id, data) => request.post(`/stories/${id}/entries`, data),
-  resetStory: (id) => request.post(`/admin/stories/${id}/reset`)
+  resetStory: (id) => request.post(`/admin/stories/${id}/reset`),
+  deleteStory: (id) => request.delete(`/admin/stories/${id}`)
 }
 
 export default api
