@@ -5,7 +5,7 @@
         <div class="admin-header-inner">
           <div>
             <h1>🛠️ 故事管理中心</h1>
-            <p class="admin-subtitle">管理所有社区微小说，支持重置故事内容</p>
+            <p class="admin-subtitle">管理所有社区微小说，支持重置与删除故事</p>
           </div>
           <button class="btn-secondary" @click="loadStories">
             🔄 刷新列表
@@ -152,19 +152,19 @@
     >
       <div class="modal card confirm-modal">
         <div class="modal-header danger">
-          <h3>🗑️ 确认删除</h3>
+          <h3>⚠️ 确认删除</h3>
           <button class="close-btn" @click="deleteConfirmVisible = false">×</button>
         </div>
         <div class="modal-body">
           <div class="confirm-content">
-            <div class="confirm-icon">⚠️</div>
+            <div class="confirm-icon">🗑️</div>
             <p class="confirm-text">
               确定要删除故事 <strong>{{ deleteTargetStory?.title }}</strong> 吗？
             </p>
             <ul class="confirm-info">
               <li>故事将从列表中永久移除</li>
-              <li>所有 <strong>{{ deleteTargetStory?.entryCount }}</strong> 段内容将被清除</li>
-              <li>数据文件中的相关记录会被删除</li>
+              <li>全部 <strong>{{ deleteTargetStory?.entryCount }}</strong> 段内容将被清除</li>
+              <li>删除后无法再查看或恢复</li>
               <li><strong class="delete-warn">此操作不可撤销！</strong></li>
             </ul>
           </div>

@@ -187,7 +187,15 @@ export function deleteStory(storyId) {
     return { success: false, error: '故事不存在', code: 404 };
   }
   delete data.stories[storyId];
-  writeData(data);
+  try {
+    writeData(data);
+  } catch (e) {
+    return { success: false, error: '数据写入失败：' + e.message, code: 500 };
+  }
+  const verify = readData();
+  if (verify.stories[storyId]) {
+    return { success: false, error: '删除失败，数据文件未更新', code: 500 };
+  }
   return { success: true };
 }
 
